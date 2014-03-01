@@ -7,13 +7,14 @@ caller=n
 mkdir -p "$config/$target"
 source ${config}/settings.conf
 
-while getopts ":f:adgls" opt; do
+while getopts ":f:adglsr" opt; do
     case ${opt} in
         a) caller=a;;
         d) caller=d;;
         g) caller=g;;
         l) caller=l;;
         s) caller=s;;
+        r) caller=r;;
         f)
             target="${OPTARG}"
             mkdir -p "$config/$target"
@@ -292,6 +293,20 @@ case $caller in
         ;;
     s)
         take_snapshot "$1"
+        ;;
+    r)
+        if [ $# -lt 1 ]; then
+            echo "Need an rsync target to sync to."
+            exit 1
+        fi
+
+        echo -n "Using rsync to backup "
+        tput setaf 4
+        echo -n "$target"
+        tput sgr0
+        echo " to $1."
+
+        rsync -az --delete --info=name "$config/$target" "$1"
         ;;
     n)
         echo "No command given. Listing targets:"
