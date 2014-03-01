@@ -170,8 +170,6 @@ function get_files {
 }
 
 function list_files {
-    echo "Files in ${target}:"
-
     # Set the search string for the `find` command.
     local search_string="*"
     if [ ! -z "$1" ]; then
@@ -245,6 +243,17 @@ function take_snapshot {
     fi
 }
 
+function list_targets {
+    tput setaf 4
+    for dir_target in $(ls "$config"); do
+        if [ -d $config/$dir_target ]; then
+            echo "  " $dir_target
+        fi
+    done
+    tput sgr0
+    echo
+}
+
 case $caller in
     a)
         echo "Adding files:"
@@ -259,11 +268,14 @@ case $caller in
         get_files $@
         ;;
     l)
+        echo "Files in ${target}:"
         list_files "$1"
         ;;
     s)
         take_snapshot "$1"
         ;;
     n)
+        echo "No command given. Listing targets:"
+        list_targets
         ;;
 esac
