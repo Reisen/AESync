@@ -63,7 +63,12 @@ function add_files {
                 continue
             fi
         elif [ -d "$file" ]; then
-            echo -n "  ? Recurse into $file? [Y/n] "
+            echo -n "  ? "
+            tput setaf 4
+            echo -n "$file"
+            tput sgr0
+            calculate_indent "$file"
+            echo -e -n "Recurse into $file? [Y/n] "
             read -n 1 choice
             echo
 
@@ -85,21 +90,30 @@ function add_files {
                 -salt \
                 -pass "pass:${encrypt_password}" \
                 -in "$file" \
-                -out "$config/$target/$(basename $file)"
+                -out "$config/$target/$file"
         fi
     done
 }
 
 function remove_files {
     for file in "$@"; do
+        # If receiving a fully expanded name such as from a recursive call,
+        # remove the leading directories leading to the config directory.
+        file=${file#$config/$target/}
+
         if [ -f "$config/$target/$file" ]; then
             echo -n "  - "
             print_directory "$file"
             echo
 
             rm "$config/$target/$file"
-        elif [ -d "$file" ]; then
-            echo -n "  ? Recurse into $file? [Y/n] "
+        elif [ -d "$config/$target/$file" ]; then
+            echo -n "  ? "
+            tput setaf 4
+            echo -n "$file"
+            tput sgr0
+            calculate_indent "$file"
+            echo -e -n "Recurse into $file? [Y/n] "
             read -n 1 choice
             echo
 
@@ -107,7 +121,7 @@ function remove_files {
                 continue
             fi
 
-            remove_files $file/*
+            remove_files $config/$target/$file/*
         #else
         #    local display="$file"
 
@@ -142,7 +156,12 @@ function get_files {
                 -in "$config/$target/$file" \
                 -out "$file"
         elif [ -d "$file" ]; then
-            echo -n "  ? Recurse into $file? [Y/n] "
+            echo -n "  ? "
+            tput setaf 4
+            echo -n "$file"
+            tput sgr0
+            calculate_indent "$file"
+            echo -e -n "Recurse into $file? [Y/n] "
             read -n 1 choice
             echo
 
