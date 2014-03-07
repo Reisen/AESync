@@ -1,11 +1,16 @@
 #!/bin/bash
 
 config=~/.config/AESync
-target="default"
 caller=n
 
 mkdir -p "$config/$target"
 source ${config}/settings.conf
+
+# Set defaults for variables.
+# TODO: Bad idea fix this for encryption keys at least.
+: ${encrypt_password=""}
+: ${authent_password=""}
+: ${target="default"}
 
 while getopts ":f:adglsr" opt; do
     case ${opt} in
